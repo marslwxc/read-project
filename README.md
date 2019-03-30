@@ -21,3 +21,4 @@ a note for my IT reading project
   1. [vim与开机](https://github.com/HanzheZhang/read-project/blob/master/Linux/vim%E4%B8%8E%E5%BC%80%E6%9C%BA.md)
   2. [用户管理](https://github.com/HanzheZhang/read-project/blob/master/Linux/%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86.md)
   3. [实用指令1：指令运行级别](https://github.com/HanzheZhang/read-project/blob/master/Linux/%E4%BD%BF%E7%94%A8%E6%8C%87%E4%BB%A41%EF%BC%9A%E6%8C%87%E4%BB%A4%E8%BF%90%E8%A1%8C%E7%BA%A7%E5%88%AB.md)
+  4. [实用指令2：帮助&文件操作](https://github.com/HanzheZhang/read-project/blob/master/Linux/%E5%AE%9E%E7%94%A8%E6%8C%87%E4%BB%A42%EF%BC%9A%E5%B8%AE%E5%8A%A9%26%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C.md)
