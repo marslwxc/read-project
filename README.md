@@ -17,8 +17,4 @@ a note for my IT reading project
   4. [chapter4 DHCP和PXE：IP是怎么来的，又是怎么没的](https://github.com/HanzheZhang/read-project/blob/master/%E8%B6%A3%E8%B0%88%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/Chapter.4%20DHCP%E5%92%8CPXE%EF%BC%9AIP%E6%98%AF%E6%80%8E%E4%B9%88%E6%9D%A5%E7%9A%84%EF%BC%8C%E5%8F%88%E6%98%AF%E6%80%8E%E4%B9%88%E6%B2%A1%E7%9A%84.md)
   5. [Chapter5 从物理层到MAC层：如何在宿舍里自己组网玩联机游戏？](https://github.com/HanzheZhang/read-project/blob/master/%E8%B6%A3%E8%B0%88%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/Chapter.5%20%E4%BB%8E%E7%89%A9%E7%90%86%E5%B1%82%E5%88%B0MAC%E5%B1%82%EF%BC%9A%E5%A6%82%E4%BD%95%E5%9C%A8%E5%AE%BF%E8%88%8D%E9%87%8C%E8%87%AA%E5%B7%B1%E7%BB%84%E7%BD%91%E7%8E%A9%E8%81%94%E6%9C%BA%E6%B8%B8%E6%88%8F%EF%BC%9F.md)
   6. [Chapter6 交换机与VLAN：办公室太复杂，我要回学校](https://github.com/HanzheZhang/read-project/blob/master/%E8%B6%A3%E8%B0%88%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/Chapter.6%20%E4%BA%A4%E6%8D%A2%E6%9C%BA%E4%B8%8EVLAN%EF%BC%9A%E5%8A%9E%E5%85%AC%E5%AE%A4%E5%A4%AA%E5%A4%8D%E6%9D%82%EF%BC%8C%E6%88%91%E8%A6%81%E5%9B%9E%E5%AD%A6%E6%A0%A1.md)
-- [Linux](https://github.com/HanzheZhang/read-project/tree/master/Linux)
-  1. [vim与开机](https://github.com/HanzheZhang/read-project/blob/master/Linux/vim%E4%B8%8E%E5%BC%80%E6%9C%BA.md)
-  2. [用户管理](https://github.com/HanzheZhang/read-project/blob/master/Linux/%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86.md)
-  3. [实用指令1：指令运行级别](https://github.com/HanzheZhang/read-project/blob/master/Linux/%E4%BD%BF%E7%94%A8%E6%8C%87%E4%BB%A41%EF%BC%9A%E6%8C%87%E4%BB%A4%E8%BF%90%E8%A1%8C%E7%BA%A7%E5%88%AB.md)
-  4. [实用指令2：帮助&文件操作](https://github.com/HanzheZhang/read-project/blob/master/Linux/%E5%AE%9E%E7%94%A8%E6%8C%87%E4%BB%A42%EF%BC%9A%E5%B8%AE%E5%8A%A9%26%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C.md)
+-
