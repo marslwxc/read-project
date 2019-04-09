@@ -1,0 +1,414 @@
+
+# /etc/passwd
+
+这个文件中保存的就是系统中所有的用户和用户的主要信息
+```bash
+[root@localhost ~]# vi /etc/passwd
+#查看一下文件内容
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+...省略部分输出...
+```
+Linux 系统中默认的用户绝大多数是系统或服务正常运行所必需的用户，我们把这种用户称为系统用户或伪用户。**系统用户是不能登录系统的，但是这些用户同样也不能被删除，因为一旦删除，依赖这些用户运行的服务或程序就不能正常执行，会导致系统问题。**
+
+## 用户名称
+第一个字段中保存的是用户名称
+## 密码标志
+这里的“x”代表的是密码标志，而不是真正的密码，真正的密码是保存在/etc/shadow文件中的。所有用户都可以读取 /etc/passwd 文件，这样非常容易导致密码的泄露。虽然密码是加密的，但是采用暴力破解的方式也是能够进行破解的。所以**现在的 Linux 系统把真正的加密密码串放置在影子文件/etc/shadow中，而影子文件的权限是 000**
+## UID
+第三个字段就是用户 ID(UID)，我们已经知道系统是通过 UID 来识别不同的用户和分配用户权限的。这些 UID 是有使用限制和要求的：
+1. 0：超级用户 UID。如果用户 UID 为 0，则代表这个账号是管理员账号。在 Linux 中如何把普通用户升级成管理员呢？只需把其他用户的 UID 修改为 0 就可以了，这一点和 Windows 是不同的。不过不建议建立多个管理员账号。
+2. 1~499：系统用户（伪用户）UID。这些 UID 是系统保留给系统用户的 UID，也就是说 UID 是 1~499 范围内的用户是不能登录系统的，而是用来运行系统或服务的。其中，1~99 是系统保留的账号，系统自动创建；100~499 是预留给用户创建账号的。
+3. 500~65535：普通用户 UID。建立的普通用户 UID 从 500 开始，最大到 65535。
+
+## GID
+第四个字段就是用户的组 ID(GID)，也就是这个用户的初始组的标志号。
+- 所谓初始组，指用户一登陆录就立刻拥有这个用户组的相关权限。每个用户的初始组只能有一个，一般就是将和这个用户的用户名相同的组名作为这个用户的初始组。举例来说，我们手工添加用户 lamp，在建立用户 lamp 的同时就会建立 lamp 组作为 lamp 用户的初始组。
+- 所谓附加组，指用户可以加入多个其他的用户组，并拥有这些组的权限。每个用户只能有一个初始组，除初始组要把用户再加入其他的用户组外，这些用户组就是这个用户的附加组。附加组可以有多个，而且用户可以有这些附加组的权限。
+
+## 用户说明
+第五个字段是这个用户的简单说明，没有什么特殊作用，可以不写。
+## 家目录
+第六个字段是这个用户的家目录，也就是用户登录后有操作权限的访问目录，我们把这个目录称为用户的家目录。
+## 登录之后的shell
+Linux 的标准 Shell 就是 /bin/bash。在 /etc/passw 文件中，大家可以把这个字段理解为用户登录之后所拥有的权限。如果写入的是 Linux 的标准Shell，/bin/bash 就代表这个用户拥有权限范围内的所有权限。
+
+# /etc/shadow
+
+这个文件中保存着用户的实际加密密码和密码有效期等参数。我们已经知道这个**文件的权限是 000，所以保存的实际加密密码除 root 用户外，其他用户是不能查看的，这样做有效地保证了密码的安全**。如果这个文件的权限发生了改变，则需要注意是否是恶意攻击。
+```bash
+[root@localhost ~]#vi /etc/shadow
+root: $6$9w5Td6lg
+$bgpsy3olsq9WwWvS5Sst2W3ZiJpuCGDY.4w4MRk3ob/i85fl38RH15wzVoom ff9isV1 PzdcXmixzhnMVhMxbvO:15775:0:99999:7:::
+bin:*:15513:0:99999:7:::
+daemon:*:15513:0:99999:7:::
+…省略部分输出…
+```
+
+## 用户名称
+第一个字段中保存的是用户名称，和 /etc/passwd 文件的用户名称相对应。
+## 密码
+第二个字段中保存的是真正加密的密码。目前 Linux 的密码采用的是 SHA512 散列加密算法，而原来采用的是 MD5 或 DES 加密算法。SHA512 散列加密算法的加密等级更高，也更加安全。
+**注意：这串密码产生的乱码不能手工修改，如果手工修改，就会算不出原密码，导致密码失效。**
+## 密码最后一次修改日期
+第三个字段是密码的修改日期， Linux 更加习惯使用时间戳代表时间。
+## 密码的两次修改间隔时间
+第四个字段是密码的两次修改间隔时间。这个字段要和第三个字段相比，也就是说密码被修改后多久不能再修改密码。如果是 0，则密码可以随时修改。如果是 10，则代表密码修改后 10 天之内不能再次修改这个密码。
+## 密码的有效期
+第五个字段是密码的有效期。这个字段也要和第三个字段相比，也就是说密码被修改后可以生效多少天。
+## 密码修改到期前的警告天数
+第六个字段是密码修改到期前的警告天数。这个字段要和第五个字段相比，就是密码到期前需提前几天修改。
+## 密码过期后的宽限天数
+第七个字段是密码过期后的宽限天数。也就是密码过期后，用户如果还是没有修改密码，那么在宽限天数内用户还是可以登录系统的；如果过了宽限天数，那么用户就无法再使用该密码登录了。
+## 账号失效时间
+第八个字段是用法的账号失效时间。这里同样要写时间戳。
+## 保留
+这个字段目前没有使用。
+
+# /etc/group
+
+这个文件是记录组 ID(GID) 和组名的对应文件。
+```bash
+[root@localhost ~]#vi /etc/group
+root:x:0:
+bin:x:1:bin,daemon
+daemon:x:2:bin,daemon
+…省略部分输出…
+lamp:x:502:
+```
+
+## 组名
+第一个字段是组名字段，也就是用户组的名称字段。
+## 组密码标志
+第二个字段是组密码标志字段。和 /etc/passwd 文件一样，这里的"x"仅仅是密码标识，真正的加密之后的组密码保存在 /etc/gshadow 文件中。
+## 组ID(GID)
+第三个字段是用户组的 ID，和 UID 一样，Linux 系统是通过 GID 来区别不同的用户组的，组名只是为了便于管理员识别。所以，在 /etc/group 文件中可以查看对应的组名和GID。
+## 组中的用户
+第四个字段表示的就是这个用户组中到底包含了哪些用户。需要注意的是，如果该用户组是这个用户的初始组，则该用户不会写入这个字段。也就是说，写入这个字段的用户是这个用户组的附加用户。
+
+# /etc/gshadow
+这个文件就是保存组密码的文件。如果我们给用户组设定了组管理员，并给该用户组设定了组密码，那么组密码就保存在这个文件中，组管理员就可以利用这个密码管理者个用户组了。
+```bash
+[root@localhost ~]#vi /etc/gshadow
+root:::
+bin:::bin, daemon
+daemon:::bin, daemon
+...省略部分输出...
+lamp:!::
+```
+
+## 组名
+第一个字段是这个用户的组名。
+## 组密码
+第二个字段就是实际加密的组密码。注意，对于大多数用户来说，这个字段不是空就是"!"，代表这个组没有合法的组密码。
+## 组管理员用户名
+第三个字段表示这个组的管理员是哪个用户。
+## 组中的附加用户
+第四个字段用于显示这个用户组中有哪些附加用户。
+
+# useradd命令：添加新的系统用户
+```bash
+[root@localhost ~]#useradd [选项] 用户名
+```
+选项：
+- -u UID: 手工指定用户的 UID，注意手工添加的用户的 UID 不要小于 500；
+- -d 家目录：手工指定用户的家目录。家目录必须写绝对路径，而且如果需要手工指定家目录，则一定要注意权限；
+- -c 用户说明：手工指定用户说明。还记得 /etc/passwd 文件的第五个字段吗？这里就是指定该字段内容的；
+- -g 组名：手工指定用户的初始组。一般以和用户名相同的组作为用户的初始组，在创建用户时会默认建立初始组。如果不想使用默认初始组，则可以用 -g 手工指定。不建议手工修改；
+- -G 组名：指定用户的附加组。我们把用户加入其他组，一般都使用附加组；
+- -s shell：手工指定用户的登录 Shell。默认是 /bin/bash；
+- -e 曰期：指定用户的失效曰期，格式为"YYYY-MM-DD"。也就是/etc/shadow文件的第八个字段；
+- -o：允许创建的用户的 UID 相同。例如，执行"useradd -u 0 -o usertest"命令建立用户 usertest，它的 UID 和 root 用户的 UID 相同，都是 0；
+- -m：建立用户时强制建立用户的家目录。在建立系统用户时，该选项是默认的；
+
+## 手工指定选项添加用户
+```bash
+[root@localhost ~]# groupadd lampl
+#先手工添加lamp1用户组，因为我一会儿要把lamp1用户的初始迎指定过来，如果不事先建立，则会报告用户组不存在
+[root@localhost ~]# useradd -u 550 -g lamp1 -G root -d /home/lamp1 -c "test user" -s /bin/bash lamp1
+#在建立用户lamp1的同时指定了UID（550）、初始组（lamp1）、附加组（root）、家目录（/home/ lamp1/）、用户说明（test user）和用户登录Shell（/bin/ bash）
+[root@localhost ~]# grep "lamp1" /etc/passwd /etc/shadow /etc/group
+#同时查看三个文件
+/etc/passwd:lamp1:x:550:502:test user:/home/lamp1:/bin/bash
+#用户的UID、初始组、用户说明、家目录和登录Shell都和命令手工指定的一致
+/etc/shadow:lamp1:!!:15710:0:99999:7:::
+#lamp1用户还没有设定密码
+/etc/group:root:x:0:lamp1
+#lamp1用户加入了root组，root组是lamp1用户的附加组
+/etc/group:lampl:x:502:
+#GID为502的组是lamp1组
+[root@localhost ~]#ll -d /home/lamp1/
+drwx------ 3 lamp1 lamp1 4096 1月6 01:13 /home/lamp1/
+#家目录也建立了，不需要手工建立
+```
+
+## useradd命令的默认值设定
+useradd 命令在添加用户时参考的默认值文件主要有两个，分别是 /etc/default/useradd 和 /etc/login.defs
+```bash
+[root@localhost ~]#vi /etc/default/useradd
+# useradd defaults file
+GR0UP=100
+HOME=/home
+INACTIVE=-1
+EXPIRE=
+SHELL=/bin/bash
+SKEL=/etc/skel
+CREATE_MAIL_SPOOL=yes
+```
+- GR0UP=100：这个选项用于建立用户的默认组，也就是说，在添加每个用户时，用户的初始组就是 GID 为 100 的这个用户组。但是我们已经知道 CentOS 并不是这样的，而是在添加用户时会自动建立和用户名相同的组作为这个用户的初始组。也就是说这个选项并没有生效，因为 Linux 中默认用户组有两种机制：一种是私有用户组机制，系统会创建一个和用户名相同的用户组作为用户的初始组；另一种是公共用户组机制，系统用 GID 是 100 的用户组作为所有新建用户的初始组。目前我们采用的是私有用户组机制。
+- HOME=/home：这个选项是用户的家目录的默认位置，所以所有新建用户的家目录默认都在 /home/ 下。
+- INACTIVE=-1：这个选项是密码过期后的宽限天数，也就是 /etc/shadow 文件的第七个字段。其作用是在密码过期后，如果用户还是没有修改密码，那么在宽限天数内用户还是可以登录系统的；如果过了宽限天数，那么用户就无法再使用该密码登录了。这里默认值是 -1，代表所有新建立的用户密码永远不会失效。
+- EXPIRE=：这个选项是密码失效时间，也就是 /etc/shadow 文件的第八个字段。也就是说，用户到达这个日期后就会直接失效。当然这里也是使用时间戳来表示日期的。默认值是空，代表所有新建用户没有失效时间，永久有效。
+- SHELL=/bin/bash：这个选项是用户的默认 Shell。/bin/bash 是 Linux 的标准 Shell，代表所有新建立的用户默认 Shell 都是 /bin/bash。
+- SKEL=/etc/skel：这个选项用于定义用户的模板目录的位置，/etc/skel/ 目录中的文件都会复制到新建用户的家目录中。
+- CREATE_MAIL_SPOOL=yes：这个选项定义是否给新建用户建立邮箱，默认是创建。也就是说，对于所有的新建用户，系统都会新建一个邮箱，放在 /var/spool/mail/ 目录下，和用户名相同。
+
+```bash
+[root@localhost ~]# vi /etc/login.defs
+#这个文件有一些注释，把注释删除，文件内容就变成下面这个样子了
+MAIL_DIR /var/spool/mail
+PASS_MAX_DAYS 99999
+PASS_MIN_DAYS 0
+PASS_MIN_LEN 5
+PASS_WARN_AGE 7
+UID_MIN 500
+UID_MAX 60000
+GID_MIN 500
+GID_MAX 60000
+CREATE_HOME yes
+UMASK 077
+USERGROUPS_ENAB yes
+ENCRYPT_METHOD SHA512
+```
+- MAIL_DIR /var/spool/mail：这行指定了新建用户的默认邮箱位置。比如 lamp 用户的邮箱是 /var/spool/mail/lamp。
+- PASS_MAX_DAYS 99999：这行指定的是密码的有效期，也就是 /etc/shadow 文件的第五个字段。代表多少天必须修改密码，默认值是 99999。
+- PASS_MIN_DAYS 0：这行指定的是密码的两次修改间隔时间，也就是 /etc/shadow 文件的第四个字段。代表第一次修改密码之后，几天后才能再次修改密码，默认值是 0。
+- PASS_MIN_LEN 5：这行代表密码的最小长度，默认不小于 5 位。但是现在用户登录时验证已经被 PAM 模块取代，所以这个选项并不生效。
+- PASS_WARN_AGE 7：这行代表密码修改到期前的警告天数，也就是 /etc/shadow 文件的第六个字段。代表密码到达有效期前多少天开始进行警告提醒，默认值是 7 天。
+- UID_MIN 500及UID_MAX 60000：这两行代表创建用户时最小 UID 和最大 UID 的范围。从 2.6.x 内核开始，Linux 用户的 UID 最大可以支持到 232，但是真正使用时最大范围是60000。还要注意，如果手工指定了一个用户的 UID 是 550，那么下一个创建的用户的 UID 就会从 551 开始，哪怕 500~549 之间的 UID 没有使用（小于 500 的 UID 是给伪用户预留的）。
+- GID_MIN 500 及 GID_MAX 60000：这两行指定了 GID 的最小值和最大值的范围。
+- CREATE_HOME yes：这行指定建立用户时是否自动建立用户的家目录，默认是建立。
+- UMASK 077：这行指定建立的用户家目录的默认权限，因为 umask 值是 077，所以新建的用户家目录的权限是 700。
+- USERGROUPS_ENAB yes：这行指定使用命令 userdd 删除用户时，是否删除用户的初始组，默认是删除。
+- ENCRYPT_METHOD SHA512：这行指定 Linux 用户的密码使用 SHA5121 散列模式加密。这是新的密码加密模式，原先的 Linux 只能用 DES 或 MD5 加密。
+
+# passwd命令：修改用户密码
+命令格式：
+```bash
+[root@localhost ~]#passwd [选项] 用户名
+```
+选项：
+- -S：査询用户密码的状态，也就是 /etc/shadow 文件中的内容。仅 root 用户可用；
+- -l：暂时锁定用户。仅 root 用户可用；
+- -u：解锁用户。仅 root 用户可用；
+- --stdin：可以将通过管道符输出的数据作为用户的密码。主要在批量添加用户时使用；
+```bash
+[root@localhost ~]# echo "123" | passwd -stdin lamp
+更改用户lamp的密码。
+passwd:所有的身份验证令牌已成功更新。
+```
+
+# usermod命令：修改用户信息
+命令格式：
+```bash
+[root@localhost ~]#usermod [选项] 用户名
+```
+选项：
+- -u UID：修改用户的UID；
+- -d 家目录：修改用户的家目录。家目录必须写绝对路径；
+- -c 用户说明：修改用户的说明信息，就是 /etc/passwd 文件的第五个字段；
+- -g 组名：修改用户的初始组，就是 /etc/passwd 文件的第四个字段；
+- -G 组名：修改用户的附加组，其实就是把用户加入其他用户组；
+- -s shell：修改用户的登录 Shell。默认是 /bin/bash；
+- -e 日期：修改用户的失效曰期，格式为"YYYY-MM-DD"。也就是 /etc/shadow 文件的第八个字段；
+- -L：临时锁定用户（Lock）；
+- -U：解锁用户（Unlock）
+
+# chage命令：修改用户密码状态
+命令格式：
+```bash
+[root@localhost ~]#chage [选项] 用户名
+```
+选项：
+- -l：列出用户的详细密码状态;
+- -d 日期：密码最后一次修改曰期（/etc/shadow 文件的第三个字段），格式为 YYYY-MM-DD;
+- -m 天数：密码的两次修改间隔时间（第四个字段）;
+- -M 天数：密码的有效期（第五个字段）;
+- -W 天数：密码修改到期前的警告天数（第六个字段）;
+- -i 天数：密码过期后的宽限天数（第七个字段）;
+- -E 日期：账号失效时间（第八个字段），格式为 YYYY-MM-DD;
+
+# userdel命令：删除用户
+命令格式：
+```bash
+[root@localhost ~]# userdel [-r] 用户名
+```
+选项：
+- -r：在删除用户的同时删除用户的家目录；
+
+# id命令：查看用户的UID和GID
+命令格式：
+```bash
+[root@localhost ~]# id 用户名
+```
+
+# su命令：切换用户身份
+命令格式：
+```bash
+[root@localhost ~]# su [选项] 用户名
+```
+选项：
+- -：选项只使用"-"代表连带用户的环境变量一起切换；
+- -c 命令：仅执行一次命令，而不切换用户身份
+
+# groupadd命令：添加用户组
+命令格式：
+```bash
+[root@localhost ~]# groupadd [选项] 组名
+```
+选项：
+- -g GID：指定组ID；
+
+# groupmod命令：修改用户组
+命令格式：
+```bash
+[root@localhost ~]# groupmod [选现] 组名
+```
+选项：
+- -g GID：修改组 ID；
+- -n 新组名：修改组名；
+
+# groupdel命令：删除用户组
+命令格式：
+```bash
+[root@localhost ~]#groupdel 组名
+```
+
+# gpasswd命令：把用户添加进组或从组中删除
+命令格式：
+```bash
+[root@localhost ~]# gpasswd 选项 组名
+```
+选项：
+- -a 用户名：把用户加入组；
+- -d 用户名：把用户从组中删除；
+
+# newgrp命令：切换用户的有效组
+命令格式：
+```bash
+[root@localhost ~]# newgrp 组名
+```
+
+# 用户管理命令归纳
+添加用户组的命令是 groupadd，命令格式如下:
+```bash
+[root@localhost ~]# groupadd [选项] 组名
+```
+选项：
+-g GID：指定组 ID
+
+添加用户组的命令比较简单，举个例子:
+```bash
+[root@localhost ~]# groupadd group1
+#添加group1组
+[root@localhost ~]# grep "group1" /etc/group
+group1:x:502:
+```
+修改用户组：groupmod
+groupmod 命令用于修改用户组的相关信息，命令格式如下：
+```bash
+[root@localhost ~]# groupmod [选现] 组名
+```
+选项：
+-g GID：修改组 ID；
+-n 新组名：修改组名；
+
+例子：
+```bash
+[root@localhost ~]# groupmod -n testgrp group1
+#把组名group1修改为testgrp
+[root@localhost ~]# grep "testgrp" /etc/group
+testgrp:x:502:
+#注意GID还是502，但是组名已经改变
+```
+不过大家还是要注意，用户名不要随意修改，组名和 GID 也不要随意修改，因为非常容易导致管理员逻辑混乱。如果非要修改用户名或组名，则建议大家先删除旧的，再建立新的。
+刪除用户组：groupdel
+groupdel 命令用于删除用户组，命令格式如下：
+```bash
+[root@localhost ~]#groupdel 组名
+例子：
+[root@localhost ~]#groupdel testgrp
+#删除testgrp
+```
+不过大家要注意，要删除的组不能是其他用户的初始组，也就是说这个组中没有初始用户才可以删除。如果组中有附加用户，则删除组时不受影响。
+把用户添加进组或从组中删除：gpasswd
+其实 gpasswd 命令是用来设定组密码并指定组管理员的，不过我们在前面已经说了，组密码和组管理员功能很少使用，而且完全可以被 sudo 命令取代，所以 gpasswd 命令现在主要用于把用户添加进组或从组中删除。
+
+gpasswd 命令格式如下：
+```bash
+[root@localhost ~]# gpasswd 选项 组名
+```
+选项：
+-a 用户名：把用户加入组；
+-d 用户名：把用户从组中删除；
+
+举个例子：
+```bash
+[root@localhost ~]# groupadd grouptest
+#添加组grouptest
+[root@localhost ~]# gpasswd -a lamp grouptest
+Adding user lamp to group grouptest
+#把用户lamp加入grouptest组
+[root@localhost ~]# grep "lamp" /etc/group
+lamp:x:501:
+grouptest:x:505:lamp
+#査看一下，lamp用户已经作为附加用户加入grouptest组
+[root@localhost ~]# gpasswd -d lamp grouptest
+Removing user lamp from group grouptest
+#把用户lamp从组中删除
+[root@localhost ~]# grep "grouptest" /etc/group grouptest:x:505:
+#组中没有lamp用户了
+```
+大家注意，也可以使用 usermod 命令把用户加入某个组，不过 usermod 命令的操作对象是用户，命令是 "usermod -G grouptest lamp"，把用户名作为参数放在最后；而 gpasswd 命令的操作对象是组，命令是"gpasswd -a lamp grouptest"，把组名作为参数放在最后。
+
+推荐大家使用 gpasswd 命令，因为这个命令不仅可以把用户加入用户组，也可以把用户从用户组中删除。
+改变有效组：newgrp
+我们说过，每个用户可以属于一个初始组（用户是这个组的初始用户），也可以属于多个附加组（用户是这个组的附加用户）。既然用户可以属于这么多用户组，那么用户在创建文件后，默认生效的组身份是哪个呢？
+
+当然是初始用户组的组身份生效了，因为初始组是用户一旦登陆就获得的组身份。也就是说，用户在创建文件后，文件的属组是用户的初始组，因为用户的有效组默认是初始组。既然用户属于多个用户组，那么能不能改变用户的有效组呢？使用命令 newgrp 就可以切换用户的有效组。命令格式如下：
+```bash
+[root@localhost ~]# newgrp 组名
+```
+举个例子，我们已经有了普通用户 lamp，默认会建立 lamp 用户组，lamp 组是 lamp 用户的初始组。我们再把 lamp 用户加入 group1 组，那么 group1 组就是 lamp 用户的附加组。当 lamp 用户创建文件 test1 时，test1 文件的属组是 lamp 组，因为 lamp 组是 lamp 用户的有效组。通过 newgrp 命令就可以把 lamp 用户的有效组变成 group1 组，当 lamp 用户创建文件 test2 时，就会发现 test2 文件的属组就是 group1 组。命令如下：
+```bash
+[root@localhost ~]# groupadd group1
+#添加组group1
+[root@localhost ~]# gpasswd -a lamp group1
+Adding user lamp to group group1 #把lamp用户加入group1组
+[root@localhost ~]# grep "lamp" /etc/group
+lamp:x:501:
+group1:x:503:lamp
+#lamp用户既属于lamp组，也属于group1组
+[root@localhost ~]# su - lamp
+#切换成lamp身份，超级用户切换成普通用户不用密码
+[lamp@localhost ~]$ touch test1
+#创建文件test1
+[lamp@localhost ~]$ll test1
+-rw-rw-r-- 1 lamp lamp 01月14 05:43 test1
+#test1文件的默认属组是lamp组
+[lamp@localhost ~]$ newgrp group1
+#切换lamp用户的有效组为group1组
+[lamp@localhost ~]$ touch test2
+#创建文件test2
+[lamp@localhost ~]$ ll test2
+-rw-r--r-- 1 lamp group1 01月 14 05:44 test2
+#test文件的默认属组是group1组
+```
+通过这个例子明白有效组的作用了吗？其实就是当用户属于多个组时，在创建文件时哪个组身份生效。使用 newgrp 命令可以在多个组身份之间切换。
+
+
+```python
+
+```
