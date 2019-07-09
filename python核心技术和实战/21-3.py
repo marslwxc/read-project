@@ -1,3 +1,4 @@
+import concurrent.futures
 import requests
 import time
 
@@ -7,9 +8,15 @@ def download_one(url):
     print('Read {} from {}'.format(len(resp.content), url))
 
 
-def downlead_all(sites):
-    for site in sites:
-        download_one(site)
+def download_all(sites):
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        to_do = []
+        for site in sites:
+            future = executor.submit(download_one, site)
+            to_do.append(future)
+
+        for future in concurrent.futures.as_completed(to_do):
+            future.result
 
 
 def main():
@@ -31,9 +38,10 @@ def main():
         'https://en.wikipedia.org/wiki/Go_(programming_language)'
     ]
     start_time = time.perf_counter()
-    downlead_all(sites)
+    download_all(sites)
     end_time = time.perf_counter()
-    print('Download {} sites in {}'.format(len(sites), end_time-start_time))
+    print('Download {} sites in {} seconds'.format(
+        len(sites), end_time - start_time))
 
 
 if __name__ == '__main__':
