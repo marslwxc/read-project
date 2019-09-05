@@ -21,6 +21,7 @@ class SingleLinkedList:
     def __init__(self):
         self._head = None
 
+
     def is_empty(self):
         return self._head == None
 
@@ -119,3 +120,4 @@ if __name__ == "__main__":
     print(single_obj.search(0))
     single_obj.remove(2)
     single_obj.travel()
+
