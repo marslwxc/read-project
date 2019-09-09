@@ -25,3 +25,11 @@ class Solution(object):
             prev = cur
             cur = n
         return prev
+
+"""
+def reverseList(self, head):
+    cur, prev = head, None
+    while cur != None:
+        cur.next, prev, cur = prev, cur, cur.next
+    return prev
+"""

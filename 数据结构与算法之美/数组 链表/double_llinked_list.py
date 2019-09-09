@@ -91,7 +91,7 @@ class DoubleLinkedList:
                 break
 
     def search(self, value):
-        p = self.__head
+        p = self._head
         while p != None:
             if p.data == value:
                 return True
