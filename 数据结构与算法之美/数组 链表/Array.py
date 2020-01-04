@@ -27,4 +27,8 @@ class Array:
         self._data = self._data + [None] * self.capacity
         self.capacity *= 2
 
-    def 
+    def insert(self, index):
+        """
+        添加元素
+        """
+        pass
